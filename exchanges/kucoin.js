@@ -10,7 +10,7 @@ const config = {
   environment: "live",
 };
 const VOLUME_THRESHOLD = 500000.0;
-const REST_CALL_INTERVAL_IN_MILLISECONDS = 100;
+const REST_CALL_INTERVAL_IN_MILLISECONDS = 500;
 const limiter = new Bottleneck({
   minTime: REST_CALL_INTERVAL_IN_MILLISECONDS,
 });
