@@ -57,6 +57,7 @@ async function getHotCoinsDetail(hotCoins) {
   let date = new Date();
   let formatedTime = moment(date).format("YYYY-MMM-DD, HH:mm:ss");
   obj["last_update"] = formatedTime;
+  obj["min_24hr_volume"] = VOLUME_THRESHOLD;
   obj["count"] = hotCoins.length;
   obj["data"] = hotCoins;
   var json = JSON.stringify(obj);
