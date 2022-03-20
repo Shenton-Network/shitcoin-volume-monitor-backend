@@ -8,7 +8,7 @@ const app = express();
 let port = process.env.PORT || 80;
 
 app.get("/", (req, res) => {
-  res.send("<h1>Hello !</h1>");
+  res.sendFile(__dirname + "/README.md");
 });
 
 app.get("/kucoinHotcoins", (req, res) => {
