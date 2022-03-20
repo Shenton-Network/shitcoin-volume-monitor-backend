@@ -12,7 +12,7 @@ app.get("/", (req, res) => {
 });
 
 app.get("/kucoinHotcoins", (req, res) => {
-  res.sendFile(__dirname + "/kucoinHotCoins.json");
+  res.sendFile(__dirname + "/data/kucoinHotCoins.json");
 });
 
 // hotCoins = getKucoinHotCoins();

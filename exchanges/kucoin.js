@@ -60,11 +60,11 @@ async function getHotCoinsDetail(hotCoins) {
   obj["data"] = hotCoins;
   var json = JSON.stringify(obj);
 
-  fs.writeFile("kucoinHotCoins.json", json, (err) => {
+  fs.writeFile("./data/kucoinHotCoins.json", json, (err) => {
     if (err) {
       throw err;
     }
-    console.log("JSON data is saved to /kucoinHotCoins.");
+    console.log("JSON data is saved to /data/kucoinHotCoins.");
   });
   return hotCoins;
 }
