@@ -6,9 +6,15 @@
   "scripts": {
     "start": "node index"
   },
-  "author": "",
+  "author": "Sun Siyue",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.17.3"
+    "@binance/connector": "^1.8.1",
+    "bottleneck": "^2.19.5",
+    "express": "^4.17.3",
+    "kucoin-node-api": "^2.1.4",
+    "moment": "^2.29.1",
+    "node-schedule": "^2.1.0",
+    "nodemon": "^2.0.15"
   }
 }
