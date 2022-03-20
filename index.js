@@ -5,7 +5,7 @@ const getKucoinHotCoins = require("./exchanges/kucoin");
 const CRON_JOB_STRING = "*/1 * * * *";
 const app = express();
 
-let hotCoins = [1, 2];
+let port = process.env.PORT || 80;
 
 app.get("/", (req, res) => {
   res.send("<h1>Hello !</h1>");
@@ -21,4 +21,4 @@ const job = schedule.scheduleJob(CRON_JOB_STRING, () => {
   getKucoinHotCoins();
 });
 
-app.listen(5000);
+app.listen(port);
