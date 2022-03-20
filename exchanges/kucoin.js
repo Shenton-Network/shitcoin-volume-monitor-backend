@@ -57,6 +57,7 @@ async function getHotCoinsDetail(hotCoins) {
   let date = new Date();
   let formatedTime = moment(date).format("YYYY-MMM-DD, HH:mm:ss");
   obj["update_timestamp"] = formatedTime;
+  obj["count"] = hotCoins.length;
   obj["data"] = hotCoins;
   var json = JSON.stringify(obj);
 
