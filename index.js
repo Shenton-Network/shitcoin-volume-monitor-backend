@@ -2,7 +2,7 @@ const express = require("express");
 const schedule = require("node-schedule");
 const getKucoinHotCoins = require("./exchanges/kucoin");
 
-const CRON_JOB_STRING = "*/2 * * * *";
+const CRON_JOB_STRING = "*/5 * * * *";
 const app = express();
 
 let port = process.env.PORT || 80;
