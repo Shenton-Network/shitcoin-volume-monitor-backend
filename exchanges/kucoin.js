@@ -55,7 +55,9 @@ async function getHotCoinsDetail(hotCoins) {
   });
   var obj = new Object();
   let date = new Date();
-  let formatedTime = moment(date).format("YYYY-MMM-DD, HH:mm:ss");
+  let formatedTime = moment(date)
+    .utcOffset("+0800")
+    .format("YYYY-MMM-DD, HH:mm:ss [SGT]");
   obj["last_update"] = formatedTime;
   obj["min_24hr_volume"] = VOLUME_THRESHOLD;
   obj["count"] = hotCoins.length;
