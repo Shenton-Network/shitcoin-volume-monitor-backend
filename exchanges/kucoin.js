@@ -10,7 +10,7 @@ const config = {
   environment: "live",
 };
 const VOLUME_THRESHOLD = 500000.0;
-const REST_CALL_INTERVAL_IN_MILLISECONDS = 500;
+const REST_CALL_INTERVAL_IN_MILLISECONDS = 200;
 const limiter = new Bottleneck({
   minTime: REST_CALL_INTERVAL_IN_MILLISECONDS,
 });
@@ -30,26 +30,46 @@ async function getHotCoinsDetail(hotCoins) {
       type: "1hour",
     };
 
-    try {
-      const lastMonthStats = await limiter.schedule(() =>
-        api.getKlines(params)
-      );
-      let vol30Days = 0;
-      for (let j = 0; j < lastMonthStats.data.length; j++) {
-        vol30Days += parseFloat(lastMonthStats.data[j][6]);
-      }
+    let shouldRetry = true;
+    while (shouldRetry) {
+      try {
+        const lastMonthStats = await limiter.schedule(() =>
+          api.getKlines(params)
+        );
+        let vol30Days = 0;
+        for (let j = 0; j < lastMonthStats.data.length; j++) {
+          vol30Days += parseFloat(lastMonthStats.data[j][6]);
+        }
 
-      hotCoins[i]["vol30Days"] = vol30Days;
-      hotCoins[i]["oneDayOver30Days"] =
-        (hotCoins[i]["vol24hr"] / hotCoins[i]["vol30Days"]) * 30;
-    } catch (err) {
-      console.log(err);
-      hotCoins[i]["vol30Days"] = 0.444;
-      hotCoins[i]["oneDayOver30Days"] = 0.444;
-      continue;
+        hotCoins[i]["vol30Days"] = vol30Days;
+        hotCoins[i]["oneDayOver30Days"] =
+          (hotCoins[i]["vol24hr"] / hotCoins[i]["vol30Days"]) * 30;
+        shouldRetry = false;
+      } catch (err) {
+        console.log(err.config.response);
+        console.log("retrying...");
+        hotCoins[i]["vol30Days"] = 0.4444444;
+        hotCoins[i]["oneDayOver30Days"] = 0.4444444;
+        continue;
+      }
     }
   }
 
+  // // retry failed ones
+  // for (let i = 0; i < hotCoins.length; i++) {
+  //   if (hotCoins[i]["oneDayOver30Days"] = 0.4444444) {
+  //     let shouldRetry = true;
+  //     while(shouldRetry) {
+  //       try {
+
+  //       } catch (err) {
+
+  //       }
+  //     }
+  //   }
+  // }
+
+  // sort by vol ratio
   hotCoins.sort((a, b) => {
     return b["oneDayOver30Days"] - a["oneDayOver30Days"];
   });
