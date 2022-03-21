@@ -55,20 +55,6 @@ async function getHotCoinsDetail(hotCoins) {
     }
   }
 
-  // // retry failed ones
-  // for (let i = 0; i < hotCoins.length; i++) {
-  //   if (hotCoins[i]["oneDayOver30Days"] = 0.4444444) {
-  //     let shouldRetry = true;
-  //     while(shouldRetry) {
-  //       try {
-
-  //       } catch (err) {
-
-  //       }
-  //     }
-  //   }
-  // }
-
   // sort by vol ratio
   hotCoins.sort((a, b) => {
     return b["oneDayOver30Days"] - a["oneDayOver30Days"];
@@ -93,6 +79,22 @@ async function getHotCoinsDetail(hotCoins) {
   return hotCoins;
 }
 
+function meetBar(coin) {
+  if (!coin.symbol.endsWith("USDT")) {
+    return false;
+  }
+  if (parseFloat(coin.volValue) < VOLUME_THRESHOLD) {
+    return false;
+  }
+  if (coin.symbol.endsWith("3S-USDT")) {
+    return false;
+  }
+  if (coin.symbol.endsWith("3L-USDT")) {
+    return false;
+  }
+  return true;
+}
+
 async function runHotCoins() {
   console.log("getting hot coins");
   let hotCoins = [];
@@ -102,10 +104,7 @@ async function runHotCoins() {
     .getAllTickers()
     .then((r) => {
       r.data.ticker.forEach((element) => {
-        if (
-          element.symbol.endsWith("USDT") &&
-          parseFloat(element.volValue) > VOLUME_THRESHOLD
-        ) {
+        if (meetBar(element)) {
           let coinObject = new Object();
           coinObject["symbol"] = element.symbol;
           coinObject["vol24hr"] = parseFloat(element.volValue);
