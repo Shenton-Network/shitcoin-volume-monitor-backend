@@ -20,11 +20,10 @@ app.get("/status", (req, res) => {
   res.send(`last updated at: ${formatedTime}`);
 });
 
-app.get("/kucoinHotcoins", (req, res) => {
+app.get("/shitcoinAlert/exchange/kucoinHotcoin", (req, res) => {
   res.sendFile(__dirname + "/data/kucoinHotCoins.json");
 });
 
-// hotCoins = getKucoinHotCoins();
 schedule.scheduleJob(CRON_JOB_STRING, () => {
   console.log("Running getKucoinHotCoins()");
   getKucoinHotCoins();
