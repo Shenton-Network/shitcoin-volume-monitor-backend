@@ -1,10 +1,12 @@
 const express = require("express");
+var cors = require("cors");
 const schedule = require("node-schedule");
 const moment = require("moment");
 const getKucoinHotCoins = require("./exchanges/kucoin");
 
 const CRON_JOB_STRING = "*/5 * * * *";
 const app = express();
+app.use(cors());
 let port = process.env.PORT || 80;
 
 let date = new Date();
