@@ -96,7 +96,7 @@ function meetBar(coin) {
 }
 
 async function runHotCoins() {
-  console.log("getting hot coins");
+  console.log("getting hot coins from kucoin");
   let hotCoins = [];
 
   api.init(config);

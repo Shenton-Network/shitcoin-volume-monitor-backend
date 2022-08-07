@@ -9,6 +9,7 @@
   "author": "Sun Siyue",
   "license": "ISC",
   "dependencies": {
+    "@binance/connector": "^1.12.0",
     "bottleneck": "^2.19.5",
     "cors": "^2.8.5",
     "express": "^4.17.3",

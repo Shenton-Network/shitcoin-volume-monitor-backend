@@ -1,8 +1,12 @@
+const fs = require("fs");
+const moment = require("moment");
 const { Spot } = require("@binance/connector");
-const api = new Spot();
+const apiKey = "";
+const apiSecret = "";
+const client = new Spot(apiKey, apiSecret);
 var Bottleneck = require("bottleneck/es5");
 const limiter = new Bottleneck({
-  minTime: 3000,
+  minTime: 100,
 });
 const config = {
   apiKey: "xxx",
@@ -12,58 +16,129 @@ const config = {
 };
 
 async function getHotCoinsDetail(hotCoins) {
+  let liveHotCoins = [];
   for (let i = 0; i < hotCoins.length; i++) {
     const ticker = hotCoins[i]["symbol"];
-    console.log(`${ticker} ${i} / ${hotCoins.length}`);
-    // get 24hr vol
-    const lastDayStats = await limiter.schedule(() => api.get24hrStats(ticker));
-    hotCoins[i]["vol24hr"] = parseFloat(lastDayStats.data.volValue);
-    hotCoins[i]["lastPrice"] = parseFloat(lastDayStats.data.last);
-    hotCoins[i]["change24hr"] = parseFloat(lastDayStats.data.changeRate * 100);
 
+    // get 24hr vol
+    let shouldRetry = true;
+    while (shouldRetry) {
+      try {
+        const lastDayStats = await limiter.schedule(() =>
+          client.ticker24hr(ticker)
+        );
+        hotCoins[i]["vol24hr"] = parseFloat(lastDayStats.data.quoteVolume);
+        hotCoins[i]["lastPrice"] = parseFloat(lastDayStats.data.lastPrice);
+        hotCoins[i]["change24hr"] = parseFloat(
+          lastDayStats.data.priceChangePercent
+        );
+        if (hotCoins[i]["vol24hr"] != 0) {
+          liveHotCoins.push(hotCoins[i]);
+        }
+        shouldRetry = false;
+      } catch (err) {
+        console.log(err.config.response);
+        console.log("retrying...");
+        continue;
+      }
+    }
+  }
+
+  for (let k = 0; k < liveHotCoins.length; k++) {
+    const ticker = liveHotCoins[k]["symbol"];
+    console.log(`${ticker} ${k} / ${liveHotCoins.length}`);
     // get 30day vol
-    const timeNow = new Date().getTime() / 1000;
-    const oneMonthAgo = timeNow - 2592000;
-    params = {
-      symbol: ticker,
-      startAt: oneMonthAgo,
-      endAt: timeNow,
-      type: "1hour",
+    const timeNow = new Date().getTime();
+    const oneMonthAgo = timeNow - 2592000000;
+    options = {
+      startTime: oneMonthAgo,
+      endTime: timeNow,
+      limit: 720,
     };
-    const lastMonthStats = await api.getKlines(params);
-    let vol30Days = 0;
-    for (let j = 0; j < lastMonthStats.data.length; j++) {
-      vol30Days += parseFloat(lastMonthStats.data[j][6]);
+
+    let shouldRetry = true;
+    while (shouldRetry) {
+      try {
+        const lastMonthStats = await limiter.schedule(() =>
+          client.klines(ticker, "1h", options)
+        );
+        let vol30Days = 0;
+        for (let j = 0; j < lastMonthStats.data.length; j++) {
+          vol30Days += parseFloat(lastMonthStats.data[j][7]);
+        }
+        liveHotCoins[k]["vol30Days"] = vol30Days;
+        // calculate heat score
+        liveHotCoins[k]["oneDayOver30Days"] =
+          (liveHotCoins[k]["vol24hr"] / liveHotCoins[k]["vol30Days"]) * 30;
+        shouldRetry = false;
+      } catch (err) {
+        console.log(err.config.response);
+        console.log("retrying...");
+        hotCoins[i]["vol30Days"] = 0.4444444;
+        hotCoins[i]["oneDayOver30Days"] = 0.4444444;
+        continue;
+      }
     }
 
-    hotCoins[i]["vol30Days"] = vol30Days;
-    hotCoins[i]["oneDayOver30Days"] =
-      (hotCoins[i]["vol24hr"] / hotCoins[i]["vol30Days"]) * 30;
-    console.log(hotCoins[i]);
+    console.log(liveHotCoins[k]);
   }
-  console.log(hotCoins);
+
+  // sort by vol ratio
+  liveHotCoins.sort((a, b) => {
+    return b["oneDayOver30Days"] - a["oneDayOver30Days"];
+  });
+
+  // write to file
+  var obj = new Object();
+  let date = new Date();
+  let formatedTime = moment(date)
+    .utcOffset("+0800")
+    .format("YYYY-MMM-DD, HH:mm:ss [SGT]");
+  obj["last_update"] = formatedTime;
+  obj["min_24hr_volume"] = 0;
+  obj["count"] = liveHotCoins.length;
+  obj["data"] = liveHotCoins;
+  var json = JSON.stringify(obj);
+
+  fs.writeFile("./data/binanceHotCoinsUsdtPair.json", json, (err) => {
+    if (err) {
+      throw err;
+    }
+    console.log("JSON data is saved to /data/binanceHotCoinsUsdtPair.json");
+  });
+}
+
+function meetBar(coin) {
+  if (!coin.symbol.endsWith("USDT")) {
+    return false;
+  }
+  if (coin.symbol.endsWith("3S-USDT")) {
+    return false;
+  }
+  if (coin.symbol.endsWith("3L-USDT")) {
+    return false;
+  }
+  return true;
 }
 
 function runHotCoins() {
-  console.log("getting hot coins");
+  console.log("getting hot coins from binance");
   let hotCoins = [];
-
-  api.exchangeInfo().then((res) => console.log(res));
-  //   api
-  //     .getSymbols()
-  //     .then((r) => {
-  //       r.data.forEach((element) => {
-  //         if (element.symbol.endsWith("USDT")) {
-  //           let coinObject = new Object();
-  //           coinObject["symbol"] = element.symbol;
-  //           hotCoins.push(coinObject);
-  //         }
-  //       });
-  //     })
-  //     .then(() => {
-  //       getHotCoinsDetail(hotCoins);
-
-  //     });
+  client
+    .exchangeInfo()
+    .then((res) => {
+      res.data.symbols.forEach((element) => {
+        if (meetBar(element)) {
+          let coinObject = new Object();
+          coinObject["symbol"] = element.symbol;
+          hotCoins.push(coinObject);
+        }
+      });
+      console.log(hotCoins.length);
+    })
+    .then(() => {
+      getHotCoinsDetail(hotCoins);
+    });
 }
 
 module.exports = runHotCoins;
