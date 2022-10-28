@@ -122,7 +122,10 @@ function meetBar(coin) {
   if (coin.symbol.startsWith("TUSD")) {
     return false;
   }
-  if (coin.symbol.startsWith("TUSD")) {
+  if (coin.symbol.startsWith("USDC")) {
+    return false;
+  }
+  if (coin.symbol.startsWith("USDP")) {
     return false;
   }
   return true;
