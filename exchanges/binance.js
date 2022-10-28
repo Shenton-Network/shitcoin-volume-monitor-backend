@@ -108,6 +108,7 @@ async function getHotCoinsDetail(hotCoins) {
   });
 }
 
+// block list
 function meetBar(coin) {
   if (!coin.symbol.endsWith("USDT")) {
     return false;
@@ -116,6 +117,9 @@ function meetBar(coin) {
     return false;
   }
   if (coin.symbol.endsWith("3L-USDT")) {
+    return false;
+  }
+  if (coin.symbol.startsWith("TUSD")) {
     return false;
   }
   return true;
