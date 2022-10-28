@@ -122,6 +122,9 @@ function meetBar(coin) {
   if (coin.symbol.startsWith("TUSD")) {
     return false;
   }
+  if (coin.symbol.startsWith("TUSD")) {
+    return false;
+  }
   return true;
 }
 
