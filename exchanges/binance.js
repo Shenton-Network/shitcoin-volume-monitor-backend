@@ -24,14 +24,10 @@ async function getHotCoinsDetail(hotCoins) {
     let shouldRetry = true;
     while (shouldRetry) {
       try {
-        const lastDayStats = await limiter.schedule(() =>
-          client.ticker24hr(ticker)
-        );
+        const lastDayStats = await limiter.schedule(() => client.ticker24hr(ticker));
         hotCoins[i]["vol24hr"] = parseFloat(lastDayStats.data.quoteVolume);
         hotCoins[i]["lastPrice"] = parseFloat(lastDayStats.data.lastPrice);
-        hotCoins[i]["change24hr"] = parseFloat(
-          lastDayStats.data.priceChangePercent
-        );
+        hotCoins[i]["change24hr"] = parseFloat(lastDayStats.data.priceChangePercent);
         if (hotCoins[i]["vol24hr"] != 0) {
           liveHotCoins.push(hotCoins[i]);
         }
@@ -59,9 +55,7 @@ async function getHotCoinsDetail(hotCoins) {
     let shouldRetry = true;
     while (shouldRetry) {
       try {
-        const lastMonthStats = await limiter.schedule(() =>
-          client.klines(ticker, "1h", options)
-        );
+        const lastMonthStats = await limiter.schedule(() => client.klines(ticker, "1h", options));
         let vol30Days = 0;
         for (let j = 0; j < lastMonthStats.data.length; j++) {
           vol30Days += parseFloat(lastMonthStats.data[j][7]);
@@ -69,7 +63,7 @@ async function getHotCoinsDetail(hotCoins) {
         liveHotCoins[k]["vol30Days"] = vol30Days;
         // calculate heat score
         liveHotCoins[k]["oneDayOver30Days"] =
-          (liveHotCoins[k]["vol24hr"] / liveHotCoins[k]["vol30Days"]) * 30;
+          (liveHotCoins[k]["vol24hr"] / liveHotCoins[k]["vol30Days"]) * 30 ?? 0;
         shouldRetry = false;
       } catch (err) {
         console.log(err.config.response);
@@ -91,9 +85,7 @@ async function getHotCoinsDetail(hotCoins) {
   // write to file
   var obj = new Object();
   let date = new Date();
-  let formatedTime = moment(date)
-    .utcOffset("+0800")
-    .format("YYYY-MMM-DD, HH:mm:ss [SGT]");
+  let formatedTime = moment(date).utcOffset("+0800").format("YYYY-MMM-DD, HH:mm:ss [SGT]");
   obj["last_update"] = formatedTime;
   obj["min_24hr_volume"] = 0;
   obj["count"] = liveHotCoins.length;

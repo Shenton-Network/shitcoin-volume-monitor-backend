@@ -33,9 +33,7 @@ async function getHotCoinsDetail(hotCoins) {
     let shouldRetry = true;
     while (shouldRetry) {
       try {
-        const lastMonthStats = await limiter.schedule(() =>
-          api.getKlines(params)
-        );
+        const lastMonthStats = await limiter.schedule(() => api.getKlines(params));
         let vol30Days = 0;
         for (let j = 0; j < lastMonthStats.data.length; j++) {
           vol30Days += parseFloat(lastMonthStats.data[j][6]);
@@ -43,7 +41,7 @@ async function getHotCoinsDetail(hotCoins) {
 
         hotCoins[i]["vol30Days"] = vol30Days;
         hotCoins[i]["oneDayOver30Days"] =
-          (hotCoins[i]["vol24hr"] / hotCoins[i]["vol30Days"]) * 30;
+          (hotCoins[i]["vol24hr"] / hotCoins[i]["vol30Days"]) * 30 ?? 0;
         shouldRetry = false;
       } catch (err) {
         console.log(err.config.response);
@@ -61,9 +59,7 @@ async function getHotCoinsDetail(hotCoins) {
   });
   var obj = new Object();
   let date = new Date();
-  let formatedTime = moment(date)
-    .utcOffset("+0800")
-    .format("YYYY-MMM-DD, HH:mm:ss [SGT]");
+  let formatedTime = moment(date).utcOffset("+0800").format("YYYY-MMM-DD, HH:mm:ss [SGT]");
   obj["last_update"] = formatedTime;
   obj["min_24hr_volume"] = VOLUME_THRESHOLD;
   obj["count"] = hotCoins.length;
