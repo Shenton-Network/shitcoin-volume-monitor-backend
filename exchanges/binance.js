@@ -62,8 +62,8 @@ async function getHotCoinsDetail(hotCoins) {
         }
         liveHotCoins[k]["vol30Days"] = vol30Days;
         // calculate heat score
-        liveHotCoins[k]["oneDayOver30Days"] =
-          (liveHotCoins[k]["vol24hr"] / liveHotCoins[k]["vol30Days"]) * 30 ?? 0;
+        let heatScore = (liveHotCoins[k]["vol24hr"] / liveHotCoins[k]["vol30Days"]) * 30;
+        liveHotCoins[k]["oneDayOver30Days"] = heatScore ?? 0;
         shouldRetry = false;
       } catch (err) {
         console.log(err.config.response);
