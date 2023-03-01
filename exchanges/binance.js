@@ -111,6 +111,12 @@ function meetBar(coin) {
   if (coin.symbol.endsWith("3L-USDT")) {
     return false;
   }
+  if (coin.symbol.endsWith("DOWNUSDT")) {
+    return false;
+  }
+  if (coin.symbol.endsWith("UPUSDT")) {
+    return false;
+  }
   if (coin.symbol.startsWith("TUSD")) {
     return false;
   }
