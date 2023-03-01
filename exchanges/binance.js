@@ -60,7 +60,7 @@ async function getHotCoinsDetail(hotCoins) {
         for (let j = 0; j < lastMonthStats.data.length; j++) {
           vol30Days += parseFloat(lastMonthStats.data[j][7]);
         }
-        liveHotCoins[k]["vol30Days"] = vol30Days == 0 ? 0.444 : vol30Days;
+        liveHotCoins[k]["vol30Days"] = vol30Days == 0 ? 444000000 : vol30Days;
         // calculate heat score
         let heatScore = (liveHotCoins[k]["vol24hr"] / liveHotCoins[k]["vol30Days"]) * 30;
         liveHotCoins[k]["oneDayOver30Days"] = heatScore ?? 0;
