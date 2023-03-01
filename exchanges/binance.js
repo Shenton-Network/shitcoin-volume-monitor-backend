@@ -102,7 +102,7 @@ async function getHotCoinsDetail(hotCoins) {
 
 // block list
 function meetBar(coin) {
-  if (!coin.symbol.endsWith("USDT")) {
+  if (!(coin.symbol.endsWith("USDT") || coin.symbol.endsWith("BUSD"))) {
     return false;
   }
   if (coin.symbol.endsWith("3S-USDT")) {
