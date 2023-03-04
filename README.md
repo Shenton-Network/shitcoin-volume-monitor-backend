@@ -12,7 +12,7 @@ Monitoring shit coins. Why trade shit coins you ask? Because BTC is too boring.
 
 # Development phases
 
-#1: track Kucoin USDT pairs
+#1: track Kucoin USDT pairs /shitcoinAlert/exchange/kucoinHotcoin
 #2: track Kucoin BTC pairs
-#3: track Binance USDT pairs
+#3: track Binance USDT pairs /shitcoinAlert/exchange/binanceHotCoinsUsdtPair
 #4: track Binance BTC pairs
