@@ -40,7 +40,7 @@ app.get("/shitcoinAlert/exchange/binanceHotCoinsBtcPair", (req, res) => {
 
 schedule.scheduleJob(CRON_JOB_STRING, () => {
   console.log("Running getKucoinHotCoins()");
-  getKucoinHotCoins();
+//  getKucoinHotCoins();
   getBinanceHotCoins();
   let date = new Date();
   formatedTime = moment(date)
