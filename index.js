@@ -8,7 +8,7 @@ const getBinanceHotCoins = require("./exchanges/binance");
 const CRON_JOB_STRING = "*/5 * * * *";
 const app = express();
 app.use(cors());
-let port = process.env.PORT || 80;
+let port = 3000;
 
 let date = new Date();
 let formatedTime = moment(date).utcOffset("+0800").format("YYYY-MMM-DD, HH:mm:ss [SGT]");
