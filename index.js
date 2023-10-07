@@ -11,9 +11,7 @@ app.use(cors());
 let port = process.env.PORT || 80;
 
 let date = new Date();
-let formatedTime = moment(date)
-  .utcOffset("+0800")
-  .format("YYYY-MMM-DD, HH:mm:ss [SGT]");
+let formatedTime = moment(date).utcOffset("+0800").format("YYYY-MMM-DD, HH:mm:ss [SGT]");
 
 app.get("/", (req, res) => {
   res.sendFile(__dirname + "/README.md");
@@ -40,12 +38,12 @@ app.get("/shitcoinAlert/exchange/binanceHotCoinsBtcPair", (req, res) => {
 
 schedule.scheduleJob(CRON_JOB_STRING, () => {
   console.log("Running getKucoinHotCoins()");
-//  getKucoinHotCoins();
+  //  getKucoinHotCoins();
   getBinanceHotCoins();
   let date = new Date();
-  formatedTime = moment(date)
-    .utcOffset("+0800")
-    .format("YYYY-MMM-DD, HH:mm:ss [SGT]");
+  formatedTime = moment(date).utcOffset("+0800").format("YYYY-MMM-DD, HH:mm:ss [SGT]");
 });
 
-app.listen(port);
+app.listen(port, () => {
+  console.log(`Demo app is up and listening to port: ${port}`);
+});
